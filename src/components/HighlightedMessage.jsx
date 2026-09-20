@@ -1,33 +1,74 @@
-// Escapes special characters so keywords like "http://a.b/c?d" work inside a RegExp.
-function escapeRegExp(text) {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+import { escapeRegExp, getHighlightPhrases, buildHighlightLegend } from "../utils/evidence";
 
-// Shows the original message and marks every detected keyword, like evidence on a case file.
-export default function HighlightedMessage({ text, keywords }) {
-  const cleaned = keywords.map((word) => word.trim()).filter(Boolean);
+// Shows the original message and marks phrases that actually appear in it.
+export default function HighlightedMessage({
+  text,
+  keywords = [],
+  phrases,
+  legend,
+  showLegend = false,
+}) {
+  const message = typeof text === "string" ? text : "";
+  const highlight = Array.isArray(phrases)
+    ? phrases.filter(Boolean)
+    : getHighlightPhrases(message, keywords);
 
-  if (cleaned.length === 0) {
-    return <p className="evidence-text">{text}</p>;
+  const legendItems = showLegend
+    ? Array.isArray(legend) && legend.length
+      ? legend.filter((item) => item?.phrase)
+      : buildHighlightLegend(message, highlight)
+    : [];
+
+  if (!message) {
+    return <p className="empty-note">Not provided.</p>;
   }
 
-  // Longest keywords first, so "bank-kyc-verify.top" wins over "bank".
+  if (highlight.length === 0) {
+    return (
+      <>
+        <p className="evidence-text">{message}</p>
+        {showLegend && (
+          <p className="legend-empty">No phrases from the analysis were found in this message.</p>
+        )}
+      </>
+    );
+  }
+
   const pattern = new RegExp(
-    `(${cleaned
+    `(${highlight
+      .slice()
       .sort((a, b) => b.length - a.length)
       .map(escapeRegExp)
       .join("|")})`,
     "gi"
   );
 
-  // Because the pattern has one capture group, matches land on the odd positions.
-  const parts = text.split(pattern);
+  const parts = message.split(pattern);
 
   return (
-    <p className="evidence-text">
-      {parts.map((part, index) =>
-        index % 2 === 1 ? <mark key={index}>{part}</mark> : <span key={index}>{part}</span>
+    <>
+      <p className="evidence-text">
+        {parts.map((part, index) =>
+          index % 2 === 1 ? <mark key={index}>{part}</mark> : <span key={index}>{part}</span>
+        )}
+      </p>
+      {showLegend && legendItems.length > 0 && (
+        <ul className="highlight-legend">
+          {legendItems.map((item) => (
+            <li key={item.phrase}>
+              <mark>{item.phrase}</mark>
+              {item.tactic ? (
+                <>
+                  <span aria-hidden="true"> → </span>
+                  <span>{item.tactic}</span>
+                </>
+              ) : (
+                <span className="legend-note"> — found in the message</span>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
-    </p>
+    </>
   );
 }

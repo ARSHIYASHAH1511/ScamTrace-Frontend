@@ -20,10 +20,24 @@ export default function Header({ showLinks, onNewScan }) {
     setMenuOpen(false);
   }
 
+  function handleBrandClick(event) {
+    closeMenu();
+    if (!showLinks) {
+      event.preventDefault();
+      document.getElementById("results-title")?.focus();
+      window.scrollTo({ top: 0 });
+    }
+  }
+
   return (
     <header className={scrolled ? "site-header is-scrolled" : "site-header"}>
       <div className="nav-pill">
-        <a className="brand" href="#home" aria-label="ScamTrace home" onClick={closeMenu}>
+        <a
+          className="brand"
+          href={showLinks ? "#home" : "#results-title"}
+          aria-label="ScamTrace home"
+          onClick={handleBrandClick}
+        >
           <LogoMark size={36} />
           <span className="brand-text">
             <span className="brand-name">ScamTrace</span>

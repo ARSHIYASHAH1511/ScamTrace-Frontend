@@ -1,29 +1,25 @@
+import { getRiskLevel, getVerdictLabel } from "../utils/risk";
 import { IconAlert, IconQuestion, IconShieldCheck } from "./Icons.jsx";
 
 const VERDICTS = {
   scam: {
-    label: "Likely a scam",
     advice: "Don't reply, click any link, or share any code.",
     Icon: IconAlert,
   },
   suspicious: {
-    label: "Suspicious",
-    advice: "Don't act on it yet. Check with the company using a number or site you already trust.",
+    advice: "Don't act on it yet. Check with the organisation using a number or site you already trust.",
     Icon: IconAlert,
   },
   safe: {
-    label: "No clear scam signs",
     advice: "Nothing strong stood out, but stay careful with any unexpected request.",
     Icon: IconShieldCheck,
   },
   unknown: {
-    label: "No verdict yet",
-    advice: "The backend didn't return a verdict for this message.",
+    advice: "The analysis did not return a verdict for this message.",
     Icon: IconQuestion,
   },
 };
 
-// A circular gauge. The colored arc grows from 0 to the confidence value.
 function ConfidenceRing({ value }) {
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
@@ -58,27 +54,40 @@ function ConfidenceRing({ value }) {
   );
 }
 
-// Returns two cells for the bento grid: the verdict, and the confidence gauge.
-export default function VerdictCard({ verdict, scamType, confidence }) {
-  const { label, advice, Icon } = VERDICTS[verdict] || VERDICTS.unknown;
+export default function VerdictCard({ verdict, scamType, confidence, risk, verdictLabel }) {
+  const key = VERDICTS[verdict] ? verdict : "unknown";
+  const { advice, Icon } = VERDICTS[key];
+  const label = verdictLabel || getVerdictLabel(key);
+  const riskLevel = risk?.id ? risk : getRiskLevel(key, confidence);
 
   return (
     <>
-      <div className="bento-cell verdict span-8" data-verdict={verdict}>
+      <div className="bento-cell verdict span-8" id="verdict" tabIndex={-1} data-verdict={key} data-risk={riskLevel.id}>
         <span className="verdict-icon">
           <Icon size={28} />
         </span>
-        <p className="verdict-label">{label}</p>
+        <div className="verdict-meta">
+          <div>
+            <p className="meta-kicker">Verdict</p>
+            <p className="verdict-label">{label}</p>
+          </div>
+          <div>
+            <p className="meta-kicker">Risk level</p>
+            <p className="risk-label">{riskLevel.label}</p>
+          </div>
+        </div>
         <p className="verdict-type">
-          {scamType ? `Scam type: ${scamType}` : "Scam type: not identified"}
+          {scamType ? `Scam type: ${scamType}` : "Scam type: Not provided."}
         </p>
         <p className="verdict-advice">{advice}</p>
       </div>
 
-      <div className="bento-cell confidence span-4" data-verdict={verdict}>
-        <ConfidenceRing value={confidence} />
+      <div className="bento-cell confidence span-4" data-verdict={key}>
+        <ConfidenceRing value={confidence ?? null} />
         <p className="confidence-caption">
-          {confidence === null ? "Confidence not provided" : "confidence in this verdict"}
+          {confidence === null || confidence === undefined
+            ? "Confidence: Not provided."
+            : "Confidence in this verdict"}
         </p>
       </div>
     </>

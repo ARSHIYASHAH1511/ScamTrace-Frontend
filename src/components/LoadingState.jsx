@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 
 const STEPS = [
-  "Reading the message",
-  "Looking for scam patterns",
-  "Searching public sources",
-  "Checking scam memory",
-  "Writing your report",
+  "Investigating message...",
+  "Checking scam indicators...",
+  "Generating safety guidance...",
 ];
 
 export default function LoadingState({ message, onCancel }) {
@@ -14,20 +12,20 @@ export default function LoadingState({ message, onCancel }) {
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveStep((step) => Math.min(step + 1, STEPS.length - 1));
-    }, 2600);
+    }, 2200);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <section className="loading" aria-labelledby="loading-title">
+    <section className="loading" aria-labelledby="loading-title" aria-busy="true">
       <div className="container loading-inner">
         <div className="loading-copy">
-          <p className="kicker">Investigation in progress</p>
+          <p className="kicker">Analysis in progress</p>
           <h1 id="loading-title" className="loading-title">
-            Tracing the message
+            Investigating message...
           </h1>
           <p className="muted" role="status">
-            {STEPS[activeStep]}…
+            {STEPS[activeStep]}
           </p>
 
           <ol className="step-list" aria-hidden="true">
@@ -43,7 +41,7 @@ export default function LoadingState({ message, onCancel }) {
           </ol>
 
           <button type="button" className="btn btn-secondary" onClick={onCancel}>
-            Cancel scan
+            Cancel
           </button>
         </div>
 
@@ -55,7 +53,7 @@ export default function LoadingState({ message, onCancel }) {
                 <i />
                 <i />
               </span>
-              <span className="terminal-name">scanning incoming-message.txt</span>
+              <span className="terminal-name">incoming-message.txt</span>
             </div>
             <div className="scan-box">
               <p className="scan-text">{message}</p>

@@ -184,74 +184,106 @@ function toSources(value) {
     .filter((source) => source.title);
 }
 
+function toTriState(value) {
+  if (value === true || value === "true" || value === 1) return true;
+  if (value === false || value === "false" || value === 0) return false;
+  return null;
+}
+
+function firstDefined(object, keys) {
+  if (!object || typeof object !== "object") return undefined;
+
+  for (const key of keys) {
+    if (object[key] !== undefined) return object[key];
+  }
+
+  return undefined;
+}
+
+/*
+  Memory is only a confirmed hit when matched === true.
+  matched === false → checked, no similar scam.
+  matched missing → memory unavailable.
+  Never infer a match from category, summary, or similarity.
+*/
 function toMemory(value) {
-  if (
-    typeof value === "string" &&
-    value.trim()
-  ) {
+  if (value === undefined || value === null) {
     return {
-      found: true,
+      matched: null,
+      category: "",
+      previousScamFamily: "",
+      summary: "",
       similarity: null,
-      summary: value.trim(),
       firstSeen: "",
       count: null,
     };
   }
 
-  if (
-    !value ||
-    typeof value !== "object"
-  ) {
-    return null;
+  if (typeof value === "string") {
+    return {
+      matched: null,
+      category: "",
+      previousScamFamily: "",
+      summary: "",
+      similarity: null,
+      firstSeen: "",
+      count: null,
+    };
   }
 
+  if (typeof value !== "object") {
+    return {
+      matched: null,
+      category: "",
+      previousScamFamily: "",
+      summary: "",
+      similarity: null,
+      firstSeen: "",
+      count: null,
+    };
+  }
+
+  const matched = toTriState(
+    firstDefined(value, ["matched", "found", "hit"])
+  );
+
+  const category = toText(pick(value, ["category"]));
+  const previousScamFamily = toText(
+    pick(value, ["previousScamFamily", "previous_scam_family"])
+  );
   const summary = toText(
-    pick(value, [
-      "summary",
-      "description",
-      "match",
-      "note",
-    ])
+    pick(value, ["summary", "description", "note"])
   );
 
-  const similarity = toPercent(
-    pick(value, [
-      "similarity",
-      "score",
-      "match_score",
-    ])
-  );
+  if (matched !== true) {
+    return {
+      matched,
+      category: "",
+      previousScamFamily: "",
+      summary: "",
+      similarity: null,
+      firstSeen: "",
+      count: null,
+    };
+  }
 
-  const found = pick(
-    value,
-    ["found", "matched", "hit"],
-    Boolean(summary || similarity)
-  );
-
-  const count = pick(
-    value,
-    [
-      "report_count",
-      "reportCount",
-      "count",
-      "reports",
-    ]
-  );
+  const count = pick(value, [
+    "report_count",
+    "reportCount",
+    "count",
+    "reports",
+  ]);
 
   return {
-    found: Boolean(found),
-    similarity,
+    matched: true,
+    category,
+    previousScamFamily,
     summary,
-    firstSeen: toText(
-      pick(value, [
-        "first_seen",
-        "firstSeen",
-      ])
+    similarity: toPercent(
+      pick(value, ["similarity", "score", "match_score"])
     ),
-    count:
-      typeof count === "number"
-        ? count
-        : null,
+    firstSeen: toText(pick(value, ["first_seen", "firstSeen"])),
+    count: typeof count === "number" ? count : null,
   };
 }
 
@@ -416,10 +448,7 @@ export function normalizeResult(rawResponse) {
         investigation.sourcesChecked
       ),
 
-      similarFound:
-        Boolean(
-          investigation.similarFound
-        ),
+      similarFound: toTriState(investigation.similarFound),
 
       previousScamFamily: toText(
         investigation.previousScamFamily
@@ -452,7 +481,7 @@ export function normalizeResult(rawResponse) {
     // -----------------------------
     // Family warning
     // -----------------------------
-    familyWarning: toText(
+      familyWarning: toText(
       pick(data, [
         "familyWarning",
         "family_warning",
@@ -461,6 +490,14 @@ export function normalizeResult(rawResponse) {
       ])
     ),
   };
+
+  if (
+    result.memory.matched === true &&
+    !result.memory.previousScamFamily &&
+    result.investigation.previousScamFamily
+  ) {
+    result.memory.previousScamFamily = result.investigation.previousScamFamily;
+  }
 
   /*
     The old placeholder Lambda returned:

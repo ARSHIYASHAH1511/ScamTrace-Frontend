@@ -7,30 +7,33 @@ const BANK_MESSAGE =
   "Update your details now at http://bank-kyc-verify.top/login to avoid suspension. " +
   "Reply with the OTP you receive to confirm. Do not ignore this message.";
 
+const PARCEL_MESSAGE =
+  "Your parcel could not be delivered because the address is incomplete. " +
+  "Pay a small redelivery fee at http://parcel-redeliver.top/pay within 24 hours or it will be returned to the sender.";
+
+const JOB_MESSAGE =
+  "Hi! We found your resume online. Earn 5,000 per day working from home, just 1 hour a day. " +
+  "No experience needed. Pay a refundable registration fee to get started. Message us on WhatsApp now.";
+
+const PRIZE_MESSAGE =
+  "Congratulations! You have been selected as the lucky winner of a brand new phone. " +
+  "Claim your prize within 2 hours by paying the delivery charge at http://claim-prize-now.site. Do not tell anyone.";
+
+const ACCOUNT_MESSAGE =
+  "Security alert: Unusual sign-in detected. Your account will be locked today. " +
+  "Verify immediately at http://account-secure-reset.top/login and enter the OTP we just sent. Do not ignore this message.";
+
+const SOCIAL_MESSAGE =
+  "Your profile was reported for unusual activity and will be disabled in 2 hours. " +
+  "Confirm your identity now at http://profile-verify-help.top and share the code from your messages to keep your account.";
+
 // Example messages. They fill the message box when the user clicks an example.
+// All examples are synthetic. They are not sent until the user clicks Analyze.
 export const SAMPLE_MESSAGES = [
   { id: "bank", label: "Bank KYC", text: BANK_MESSAGE },
-  {
-    id: "parcel",
-    label: "Parcel fee",
-    text:
-      "Your parcel could not be delivered because the address is incomplete. " +
-      "Pay a small redelivery fee at http://parcel-redeliver.top/pay within 24 hours or it will be returned to the sender.",
-  },
-  {
-    id: "job",
-    label: "Fake job",
-    text:
-      "Hi! We found your resume online. Earn 5,000 per day working from home, just 1 hour a day. " +
-      "No experience needed. Pay a refundable registration fee to get started. Message us on WhatsApp now.",
-  },
-  {
-    id: "prize",
-    label: "Prize win",
-    text:
-      "Congratulations! You have been selected as the lucky winner of a brand new phone. " +
-      "Claim your prize within 2 hours by paying the delivery charge at http://claim-prize-now.site. Do not tell anyone.",
-  },
+  { id: "parcel", label: "Parcel fee", text: PARCEL_MESSAGE },
+  { id: "job", label: "Fake job", text: JOB_MESSAGE },
+  { id: "prize", label: "Prize win", text: PRIZE_MESSAGE },
   {
     id: "payment",
     label: "Wrong payment",
@@ -45,6 +48,18 @@ export const SAMPLE_MESSAGES = [
       "Join our private crypto group. Members are doubling their money in 7 days with guaranteed returns. " +
       "Only 5 spots left. Send your first deposit today to lock in your place.",
   },
+  { id: "account", label: "Account lock", text: ACCOUNT_MESSAGE },
+  { id: "social", label: "Profile warning", text: SOCIAL_MESSAGE },
+];
+
+// Hero "Try an example" chips. Populate the textarea only — do not auto-submit.
+export const DEMO_EXAMPLES = [
+  { id: "bank", label: "Banking", text: BANK_MESSAGE },
+  { id: "parcel", label: "Delivery", text: PARCEL_MESSAGE },
+  { id: "prize", label: "Prize", text: PRIZE_MESSAGE },
+  { id: "job", label: "Job", text: JOB_MESSAGE },
+  { id: "account", label: "Account phishing", text: ACCOUNT_MESSAGE },
+  { id: "social", label: "Social media", text: SOCIAL_MESSAGE },
 ];
 
 export const SAMPLE_MESSAGE = BANK_MESSAGE;
@@ -60,29 +75,23 @@ export const SAMPLE_RAW_RESULT = {
     "Uses a threat of suspension to stop you from thinking or checking first.",
   ],
   mechanism:
-    "The scammer sends a link to a fake login page that looks like your bank. When you enter your details, they capture them. " +
-    "The OTP you are asked to share is the bank's real security code for a transaction the scammer is making at that moment, " +
-    "so sharing it lets them move money out of your account.",
+    "1. Create fear by claiming the account will be blocked today. " +
+    "2. Create urgency so the recipient does not pause to check. " +
+    "3. Request sensitive information such as KYC details and an OTP. " +
+    "4. Attempt to redirect the recipient through an unofficial login link. " +
+    "5. Use captured details or the OTP to take over the account.",
   keywords: ["URGENT", "blocked", "KYC", "http://bank-kyc-verify.top/login", "OTP", "Do not ignore"],
-  sources: [
-    {
-      title: "National Cybercrime Reporting Portal",
-      url: "https://cybercrime.gov.in",
-      snippet: "Official place to report online financial fraud and cybercrime in India.",
-    },
-    {
-      title: "Scamwatch: Phishing scams",
-      url: "https://www.scamwatch.gov.au",
-      snippet: "Explains how phishing messages imitate banks and how to spot them.",
-    },
-  ],
+  investigation: {
+    keywords: ["URGENT", "blocked", "KYC", "OTP"],
+    sourcesChecked: [],
+    similarFound: false,
+    previousScamFamily: "",
+  },
+  sources: [],
   memory: {
-    found: true,
-    similarity: 91,
-    summary:
-      "Closely matches earlier bank KYC phishing messages that use urgency, a lookalike link and an OTP request.",
-    first_seen: "Earlier this year",
-    report_count: 14,
+    matched: false,
+    category: "KYC phishing",
+    previousScamFamily: "",
   },
   complaint_draft:
     "To,\nThe Cyber Crime Cell / National Cybercrime Reporting Portal\n\n" +

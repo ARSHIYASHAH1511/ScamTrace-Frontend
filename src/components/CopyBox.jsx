@@ -46,7 +46,7 @@ export default function CopyBox({ id, title, icon: Icon, description, text, butt
           aria-labelledby={`${id}-title`}
         />
       ) : (
-        <p className="empty-note">No draft was returned for this message.</p>
+        <p className="empty-note">Not provided.</p>
       )}
 
       <div className="copybox-footer">

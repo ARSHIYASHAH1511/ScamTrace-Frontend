@@ -6,6 +6,7 @@ import MechanismCard from "./MechanismCard.jsx";
 import SourcesCard from "./SourcesCard.jsx";
 import MemoryCard from "./MemoryCard.jsx";
 import ActionsSection from "./ActionsSection.jsx";
+import ResultsNav from "./ResultsNav.jsx";
 import { IconRefresh } from "./Icons.jsx";
 
 function Notice({ title, children }) {
@@ -34,6 +35,8 @@ export default function ResultsDashboard({ result, message, isSample, onReset })
           Analysis results
         </h1>
 
+        <ResultsNav />
+
         {isSample && (
           <Notice title="This is a sample report">
             It uses made-up example data so you can preview the dashboard. Analyze a real message
@@ -56,20 +59,34 @@ export default function ResultsDashboard({ result, message, isSample, onReset })
             verdict={result.verdict}
             scamType={result.scamType}
             confidence={result.confidence}
+            risk={result.risk}
+            verdictLabel={result.verdictLabel}
           />
-          <KeywordsCard message={message} keywords={result.keywords} className="span-7" />
+          <KeywordsCard
+            message={message}
+            keywords={result.keywords}
+            highlightPhrases={result.highlightPhrases}
+            highlightLegend={result.highlightLegend}
+            className="span-7"
+          />
           <MechanismCard mechanism={result.mechanism} className="span-5" />
-          <ReasonsCard reasons={result.reasons} className="span-6" />
+          <ReasonsCard
+            reasons={result.reasons}
+            evidence={result.evidence}
+            explanation={result.explanation}
+            className="span-6"
+          />
           <div className="bento-stack span-6">
-            <SourcesCard sources={result.sources} />
+            <SourcesCard
+              sources={result.sources}
+              investigation={result.investigation}
+              memoryMatched={result.memory?.matched}
+            />
             <MemoryCard memory={result.memory} />
           </div>
         </div>
 
-        <ActionsSection
-          complaintDraft={result.complaintDraft}
-          familyWarning={result.familyWarning}
-        />
+        <ActionsSection message={message} result={result} />
 
         <div className="results-footer">
           <button type="button" className="btn btn-primary" onClick={onReset}>

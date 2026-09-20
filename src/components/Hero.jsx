@@ -1,5 +1,5 @@
 import { MAX_MESSAGE_LENGTH } from "../config";
-import { SAMPLE_MESSAGES } from "../data/sampleData";
+import { DEMO_EXAMPLES } from "../data/sampleData";
 import ErrorState from "./ErrorState.jsx";
 import { IconSearch } from "./Icons.jsx";
 
@@ -43,7 +43,7 @@ export default function Hero({
           evidence, and drafts the reports you need — in about a minute.
         </p>
 
-        {error && <ErrorState kind={error.kind} message={error.message} onRetry={onAnalyze} />}
+        {error && <ErrorState kind={error.kind} onRetry={onAnalyze} />}
 
         <form className="composer-wrap" onSubmit={handleSubmit}>
           <div className="composer">
@@ -66,9 +66,11 @@ export default function Hero({
               value={message}
               onChange={(event) => onMessageChange(event.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Paste the suspicious message here. A blocked-account text, a prize you never entered, a parcel you didn't order…"
+              placeholder="Paste a suspicious message to begin."
               rows={9}
               spellCheck={false}
+              autoComplete="off"
+              aria-invalid={isTooLong}
               aria-describedby="composer-hint"
             />
 
@@ -77,7 +79,7 @@ export default function Hero({
                 {isTooLong
                   ? `Message is too long. Shorten it by ${length - MAX_MESSAGE_LENGTH} characters.`
                   : isEmpty
-                    ? "Don't paste passwords or OTPs. Only the message itself."
+                    ? "Paste a suspicious message to begin. Don't paste passwords or OTPs."
                     : `${length.toLocaleString()} / ${MAX_MESSAGE_LENGTH.toLocaleString()} characters`}
               </p>
               <button
@@ -92,9 +94,9 @@ export default function Hero({
           </div>
         </form>
 
-        <div className="sample-row">
-          <span className="sample-label">Try a known pattern</span>
-          {SAMPLE_MESSAGES.slice(0, 4).map((sample) => (
+        <div className="sample-row" role="group" aria-label="Try an example">
+          <span className="sample-label">Try an example</span>
+          {DEMO_EXAMPLES.map((sample) => (
             <button
               key={sample.id}
               type="button"

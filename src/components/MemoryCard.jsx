@@ -1,46 +1,54 @@
 import Card, { EmptyNote } from "./Card.jsx";
 import { IconDatabase } from "./Icons.jsx";
 
+function Detail({ label, value }) {
+  if (!value && value !== 0) return null;
+
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+}
+
 export default function MemoryCard({ memory }) {
-  if (!memory) {
+  const matched = memory?.matched;
+
+  if (matched !== true && matched !== false) {
     return (
       <Card title="Similar scam memory" icon={IconDatabase}>
-        <EmptyNote>The memory check didn't return a result for this message.</EmptyNote>
+        <p className="memory-status memory-none">Unavailable</p>
+        <EmptyNote>Scam memory is currently unavailable.</EmptyNote>
       </Card>
     );
   }
 
-  if (!memory.found) {
+  if (matched === false) {
     return (
       <Card title="Similar scam memory" icon={IconDatabase}>
-        <p className="memory-status memory-none">No close match</p>
-        <p className="prose">ScamTrace hasn't seen a message like this before.</p>
+        <p className="memory-status memory-none">No match</p>
+        <p className="prose">No similar scam found in ScamTrace memory.</p>
       </Card>
     );
   }
 
   return (
     <Card title="Similar scam memory" icon={IconDatabase}>
-      <p className="memory-status memory-hit">
-        Match found{memory.similarity !== null ? `: ${memory.similarity}% similar` : ""}
-      </p>
+      <p className="memory-status memory-hit">Match found</p>
       {memory.summary && <p className="prose">{memory.summary}</p>}
-      {(memory.firstSeen || memory.count !== null) && (
-        <dl className="memory-meta">
-          {memory.firstSeen && (
-            <div>
-              <dt>First seen</dt>
-              <dd>{memory.firstSeen}</dd>
-            </div>
-          )}
-          {memory.count !== null && (
-            <div>
-              <dt>Similar reports</dt>
-              <dd>{memory.count}</dd>
-            </div>
-          )}
-        </dl>
-      )}
+      <dl className="memory-meta">
+        <Detail label="Category" value={memory.category || "Not provided."} />
+        <Detail
+          label="Previous scam family"
+          value={memory.previousScamFamily || "Not provided."}
+        />
+        {memory.similarity !== null && (
+          <Detail label="Similarity" value={`${memory.similarity}%`} />
+        )}
+        <Detail label="First seen" value={memory.firstSeen} />
+        {memory.count !== null && <Detail label="Similar reports" value={memory.count} />}
+      </dl>
     </Card>
   );
 }

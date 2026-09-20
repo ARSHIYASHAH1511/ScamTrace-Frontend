@@ -1,7 +1,7 @@
 // One cell of the results "bento" grid. `icon` is optional, `className` sets its size.
-export default function Card({ title, icon: Icon, children, className = "" }) {
+export default function Card({ title, icon: Icon, children, className = "", id }) {
   return (
-    <section className={`bento-cell ${className}`.trim()}>
+    <section className={`bento-cell ${className}`.trim()} id={id} tabIndex={id ? -1 : undefined}>
       <h3 className="cell-title">
         {Icon && (
           <span className="cell-icon">

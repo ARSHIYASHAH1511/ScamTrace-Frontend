@@ -3,7 +3,7 @@ import { IconChevron } from "./Icons.jsx";
 const QUESTIONS = [
   {
     q: "How does ScamTrace decide if a message is a scam?",
-    a: "It looks at the wording and tricks used in the message, searches public sources for reports of similar scams, and compares the message with scams it has seen before. You get the reasons, not just a label.",
+    a: "It looks at the wording and tricks used in the message and returns a structured explanation. Treat the result as guidance, not proof.",
   },
   {
     q: "Can ScamTrace be wrong?",

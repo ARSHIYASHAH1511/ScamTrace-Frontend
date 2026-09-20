@@ -37,6 +37,7 @@ export default function Footer({ showLinks }) {
             <li>
               <a href="https://cybercrime.gov.in" target="_blank" rel="noopener noreferrer">
                 Report at cybercrime.gov.in
+                <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </li>
             <li>India: call 1930 for financial fraud</li>

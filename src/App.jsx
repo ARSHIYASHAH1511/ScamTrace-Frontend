@@ -14,6 +14,7 @@ import Footer from "./components/Footer.jsx";
 import { analyzeMessage } from "./services/api";
 import { normalizeResult } from "./services/normalizeResult";
 import { SAMPLE_MESSAGE, SAMPLE_RAW_RESULT } from "./data/sampleData";
+import { enrichResult } from "./utils/enrichResult";
 
 export default function App() {
   const [status, setStatus] = useState("idle");
@@ -37,7 +38,7 @@ export default function App() {
     try {
       const data = await analyzeMessage(text, { signal: controller.signal });
       if (requestRef.current !== controller) return;
-      setResult(data);
+      setResult(enrichResult(data, text));
       setStatus("success");
     } catch (err) {
       if (requestRef.current !== controller) return;
@@ -65,7 +66,7 @@ export default function App() {
 
   function handlePreviewSample() {
     setMessage(SAMPLE_MESSAGE);
-    setResult(normalizeResult(SAMPLE_RAW_RESULT));
+    setResult(enrichResult(normalizeResult(SAMPLE_RAW_RESULT), SAMPLE_MESSAGE));
     setIsSample(true);
     setStatus("success");
   }
@@ -83,9 +84,12 @@ export default function App() {
 
   return (
     <div className="app">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
       <Atmosphere />
       <Header showLinks={showHome} onNewScan={handleReset} />
-      <main>
+      <main id="main-content">
         {showHome && (
           <>
             <Hero
