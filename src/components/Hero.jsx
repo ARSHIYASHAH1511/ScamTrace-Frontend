@@ -9,6 +9,7 @@ export default function Hero({
   onAnalyze,
   onUseSample,
   onPreviewSample,
+  onPreviewNewSample,
   error,
 }) {
   const length = message.length;
@@ -111,7 +112,11 @@ export default function Hero({
         <p className="preview-line">
           Just exploring?{" "}
           <button type="button" className="link-button" onClick={onPreviewSample}>
-            Preview a sample case file
+            Preview a previously seen pattern
+          </button>
+          {" · "}
+          <button type="button" className="link-button" onClick={onPreviewNewSample}>
+            Preview a new pattern
           </button>
         </p>
       </div>

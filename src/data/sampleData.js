@@ -66,7 +66,7 @@ export const SAMPLE_MESSAGE = BANK_MESSAGE;
 
 export const SAMPLE_RAW_RESULT = {
   verdict: "scam",
-  scam_type: "Bank KYC phishing",
+  scam_type: "KYC / Banking Phishing",
   confidence: 96,
   reasons: [
     "Creates false urgency: the account will be blocked \"today\".",
@@ -84,14 +84,13 @@ export const SAMPLE_RAW_RESULT = {
   investigation: {
     keywords: ["URGENT", "blocked", "KYC", "OTP"],
     sourcesChecked: [],
-    similarFound: false,
-    previousScamFamily: "",
+    similarFound: true,
+    previousScamFamily: "KYC / Banking Phishing",
   },
   sources: [],
   memory: {
-    matched: false,
-    category: "KYC phishing",
-    previousScamFamily: "",
+    matched: true,
+    category: "KYC / Banking Phishing",
   },
   complaint_draft:
     "To,\nThe Cyber Crime Cell / National Cybercrime Reporting Portal\n\n" +
@@ -104,4 +103,33 @@ export const SAMPLE_RAW_RESULT = {
   family_warning:
     "Scam alert: I got a text saying my bank account will be blocked unless I update KYC through a link. It is a scam. " +
     "Do not click the link and never share an OTP with anyone. If you get a message like this, call your bank using the number on your card.",
+};
+
+export const SAMPLE_NEW_MESSAGE = PARCEL_MESSAGE;
+
+export const SAMPLE_NEW_RAW_RESULT = {
+  verdict: "scam",
+  scam_type: "Delivery Scam",
+  confidence: 91,
+  reasons: [
+    "Asks for a redelivery fee for a parcel that may not exist.",
+    "Uses a short deadline to stop you checking first.",
+    "The payment link is not an official delivery-company domain.",
+  ],
+  mechanism:
+    "1. Claim a parcel could not be delivered. " +
+    "2. Demand a small fee through an unofficial link. " +
+    "3. Collect card or account details on the payment page.",
+  keywords: ["parcel", "fee", "delivery"],
+  investigation: {
+    keywords: ["parcel", "fee", "delivery"],
+    sourcesChecked: [],
+    similarFound: false,
+    previousScamFamily: "",
+  },
+  sources: [],
+  memory: {
+    matched: false,
+    category: "Delivery Scam",
+  },
 };

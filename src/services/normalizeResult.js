@@ -5,6 +5,8 @@
   the Lambda formats its response.
 */
 
+import { toTimestamp } from "../utils/seenTime";
+
 function pick(object, keys, fallback = undefined) {
   if (!object || typeof object !== "object") return fallback;
 
@@ -200,47 +202,35 @@ function firstDefined(object, keys) {
   return undefined;
 }
 
+function emptyMemory(matched = null) {
+  return {
+    matched,
+    category: "",
+    previousScamFamily: "",
+    firstSeen: null,
+    lastSeen: null,
+    reportCount: null,
+  };
+}
+
+function toReportCount(value) {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && /^\d+$/.test(value.trim())) {
+    return Number(value.trim());
+  }
+  return null;
+}
+
 /*
-  Memory is only a confirmed hit when matched === true.
-  matched === false → checked, no similar scam.
+  Memory is only a confirmed family hit when matched === true.
+  That means this scam category was seen before — not the exact message.
+  matched === false → new family.
   matched missing → memory unavailable.
   Never infer a match from category, summary, or similarity.
 */
 function toMemory(value) {
-  if (value === undefined || value === null) {
-    return {
-      matched: null,
-      category: "",
-      previousScamFamily: "",
-      summary: "",
-      similarity: null,
-      firstSeen: "",
-      count: null,
-    };
-  }
-
-  if (typeof value === "string") {
-    return {
-      matched: null,
-      category: "",
-      previousScamFamily: "",
-      summary: "",
-      similarity: null,
-      firstSeen: "",
-      count: null,
-    };
-  }
-
-  if (typeof value !== "object") {
-    return {
-      matched: null,
-      category: "",
-      previousScamFamily: "",
-      summary: "",
-      similarity: null,
-      firstSeen: "",
-      count: null,
-    };
+  if (value === undefined || value === null || typeof value !== "object") {
+    return emptyMemory(null);
   }
 
   const matched = toTriState(
@@ -251,39 +241,32 @@ function toMemory(value) {
   const previousScamFamily = toText(
     pick(value, ["previousScamFamily", "previous_scam_family"])
   );
-  const summary = toText(
-    pick(value, ["summary", "description", "note"])
+
+  const firstSeen = toTimestamp(
+    firstDefined(value, ["firstSeen", "first_seen"])
+  );
+  const lastSeen = toTimestamp(
+    firstDefined(value, ["lastSeen", "last_seen"])
+  );
+
+  const reportCount = toReportCount(
+    firstDefined(value, ["reportCount", "report_count", "count", "reports"])
   );
 
   if (matched !== true) {
     return {
-      matched,
-      category: "",
-      previousScamFamily: "",
-      summary: "",
-      similarity: null,
-      firstSeen: "",
-      count: null,
+      ...emptyMemory(matched),
+      category,
     };
   }
-
-  const count = pick(value, [
-    "report_count",
-    "reportCount",
-    "count",
-    "reports",
-  ]);
 
   return {
     matched: true,
     category,
     previousScamFamily,
-    summary,
-    similarity: toPercent(
-      pick(value, ["similarity", "score", "match_score"])
-    ),
-    firstSeen: toText(pick(value, ["first_seen", "firstSeen"])),
-    count: typeof count === "number" ? count : null,
+    firstSeen,
+    lastSeen,
+    reportCount,
   };
 }
 
@@ -491,12 +474,16 @@ export function normalizeResult(rawResponse) {
     ),
   };
 
-  if (
-    result.memory.matched === true &&
-    !result.memory.previousScamFamily &&
-    result.investigation.previousScamFamily
-  ) {
-    result.memory.previousScamFamily = result.investigation.previousScamFamily;
+  if (result.memory.matched === true) {
+    if (!result.memory.previousScamFamily && result.investigation.previousScamFamily) {
+      result.memory.previousScamFamily = result.investigation.previousScamFamily;
+    }
+    if (!result.memory.category) {
+      result.memory.category =
+        result.memory.previousScamFamily || result.scamType;
+    }
+  } else if (result.memory.matched === false && !result.memory.category) {
+    result.memory.category = result.scamType;
   }
 
   /*

@@ -14,7 +14,7 @@ export default function ReasonsCard({ reasons = [], evidence, explanation, class
   const hasExplanation = Boolean(explanation);
 
   return (
-    <Card title="Why it's suspicious" icon={IconEye} className={className} id="why-suspicious">
+    <Card title="Why this looks suspicious" icon={IconEye} className={className} id="why-suspicious">
       {!hasWhy && !hasExplanation ? (
         <EmptyNote>No evidence was returned for this message.</EmptyNote>
       ) : (

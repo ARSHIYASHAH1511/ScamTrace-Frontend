@@ -28,6 +28,18 @@ export default function KeywordsCard({
       ) : (
         <EmptyNote>Not provided.</EmptyNote>
       )}
+      {Array.isArray(keywords) && keywords.length > 0 && (
+        <>
+          <p className="meta-kicker keyword-kicker">Keywords</p>
+          <ul className="chips">
+            {[...new Set(keywords.filter(Boolean))].map((word) => (
+              <li key={word} className="chip">
+                {word}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </Card>
   );
 }

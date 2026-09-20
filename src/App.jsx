@@ -13,8 +13,9 @@ import ResultsDashboard from "./components/ResultsDashboard.jsx";
 import Footer from "./components/Footer.jsx";
 import { analyzeMessage } from "./services/api";
 import { normalizeResult } from "./services/normalizeResult";
-import { SAMPLE_MESSAGE, SAMPLE_RAW_RESULT } from "./data/sampleData";
+import { SAMPLE_MESSAGE, SAMPLE_NEW_MESSAGE, SAMPLE_NEW_RAW_RESULT, SAMPLE_RAW_RESULT } from "./data/sampleData";
 import { enrichResult } from "./utils/enrichResult";
+import { getVerdictLabel } from "./utils/risk";
 
 export default function App() {
   const [status, setStatus] = useState("idle");
@@ -22,6 +23,7 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [isSample, setIsSample] = useState(false);
+  const [sessionHistory, setSessionHistory] = useState([]);
   const requestRef = useRef(null);
 
   async function handleAnalyze() {
@@ -38,7 +40,21 @@ export default function App() {
     try {
       const data = await analyzeMessage(text, { signal: controller.signal });
       if (requestRef.current !== controller) return;
-      setResult(enrichResult(data, text));
+      const enriched = enrichResult(data, text);
+      setResult(enriched);
+      setSessionHistory((previous) =>
+        [
+          {
+            id: `${Date.now()}-${previous.length}`,
+            scamType: enriched.scamType || "Not provided.",
+            verdict: enriched.verdict,
+            verdictLabel: enriched.verdictLabel || getVerdictLabel(enriched.verdict),
+            confidence: enriched.confidence,
+            matched: enriched.memory?.matched,
+          },
+          ...previous,
+        ].slice(0, 8)
+      );
       setStatus("success");
     } catch (err) {
       if (requestRef.current !== controller) return;
@@ -71,6 +87,13 @@ export default function App() {
     setStatus("success");
   }
 
+  function handlePreviewNewSample() {
+    setMessage(SAMPLE_NEW_MESSAGE);
+    setResult(enrichResult(normalizeResult(SAMPLE_NEW_RAW_RESULT), SAMPLE_NEW_MESSAGE));
+    setIsSample(true);
+    setStatus("success");
+  }
+
   function handleReset() {
     setStatus("idle");
     setMessage("");
@@ -98,6 +121,7 @@ export default function App() {
               onAnalyze={handleAnalyze}
               onUseSample={handleUseSample}
               onPreviewSample={handlePreviewSample}
+              onPreviewNewSample={handlePreviewNewSample}
               error={error}
             />
             <TrustBar />
@@ -116,6 +140,7 @@ export default function App() {
             result={result}
             message={message}
             isSample={isSample}
+            sessionHistory={sessionHistory}
             onReset={handleReset}
           />
         )}

@@ -5,6 +5,7 @@ import ReasonsCard from "./ReasonsCard.jsx";
 import MechanismCard from "./MechanismCard.jsx";
 import SourcesCard from "./SourcesCard.jsx";
 import MemoryCard from "./MemoryCard.jsx";
+import SessionHistory from "./SessionHistory.jsx";
 import ActionsSection from "./ActionsSection.jsx";
 import ResultsNav from "./ResultsNav.jsx";
 import { IconRefresh } from "./Icons.jsx";
@@ -18,7 +19,13 @@ function Notice({ title, children }) {
   );
 }
 
-export default function ResultsDashboard({ result, message, isSample, onReset }) {
+export default function ResultsDashboard({
+  result,
+  message,
+  isSample,
+  sessionHistory = [],
+  onReset,
+}) {
   const headingRef = useRef(null);
 
   // When results appear, move focus to the top so screen readers announce them.
@@ -39,8 +46,8 @@ export default function ResultsDashboard({ result, message, isSample, onReset })
 
         {isSample && (
           <Notice title="This is a sample report">
-            It uses made-up example data so you can preview the dashboard. Analyze a real message
-            to get a real result.
+            It uses made-up example data so you can preview the dashboard, including a mock
+            previously seen scam family. Analyze a real message to query ScamTrace memory.
           </Notice>
         )}
 
@@ -64,7 +71,14 @@ export default function ResultsDashboard({ result, message, isSample, onReset })
           />
           <KeywordsCard
             message={message}
-            keywords={result.keywords}
+            keywords={[
+              ...new Set([
+                ...(Array.isArray(result.keywords) ? result.keywords : []),
+                ...(Array.isArray(result.investigation?.keywords)
+                  ? result.investigation.keywords
+                  : []),
+              ]),
+            ]}
             highlightPhrases={result.highlightPhrases}
             highlightLegend={result.highlightLegend}
             className="span-7"
@@ -81,10 +95,13 @@ export default function ResultsDashboard({ result, message, isSample, onReset })
               sources={result.sources}
               investigation={result.investigation}
               memoryMatched={result.memory?.matched}
+              scamType={result.scamType}
             />
-            <MemoryCard memory={result.memory} />
+            <MemoryCard memory={result.memory} scamType={result.scamType} />
           </div>
         </div>
+
+        <SessionHistory items={sessionHistory} />
 
         <ActionsSection message={message} result={result} />
 

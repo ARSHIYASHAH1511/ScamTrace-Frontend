@@ -1106,6 +1106,7 @@ main { flex: 1; position: relative; z-index: 1; }
 #why-suspicious,
 #investigation,
 #mechanism,
+#memory,
 #action-center {
   scroll-margin-top: 168px;
 }
@@ -1418,6 +1419,8 @@ main { flex: 1; position: relative; z-index: 1; }
   font-weight: 600;
 }
 
+.keyword-kicker { margin: 1rem 0 0.55rem; }
+
 .memory-status {
   display: inline-block;
   margin-bottom: 0.6rem;
@@ -1427,12 +1430,58 @@ main { flex: 1; position: relative; z-index: 1; }
   font-weight: 600;
 }
 
-.memory-hit { background: rgba(255, 93, 115, 0.14); color: var(--danger); }
+.memory-hit { background: rgba(255, 193, 74, 0.16); color: var(--evidence); }
+.memory-new { background: rgba(92, 225, 255, 0.12); color: var(--accent-strong); }
 .memory-none { background: rgba(147, 160, 189, 0.14); color: var(--text-muted); }
+
+.memory-family {
+  margin: 0.15rem 0 0.45rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.memory-count {
+  margin-top: 0.55rem;
+  font-weight: 600;
+}
 
 .memory-meta { display: flex; flex-wrap: wrap; gap: 1.1rem 2rem; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--line); }
 .memory-meta dt { font-size: 0.82rem; color: var(--text-muted); }
 .memory-meta dd { font-weight: 600; }
+
+.session-history {
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.session-history-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.7rem;
+}
+
+.session-history-item {
+  min-width: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.session-history-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.session-history-type {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.session-history-meta {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
 
 /* 11. Actions ------------------------------------------------------------ */
 .actions { margin-top: 2rem; padding-top: 2.25rem; border-top: 1px solid var(--line); }

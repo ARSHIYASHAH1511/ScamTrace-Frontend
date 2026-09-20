@@ -2,6 +2,7 @@ const LINKS = [
   { href: "#verdict", label: "Verdict" },
   { href: "#why-suspicious", label: "Why suspicious" },
   { href: "#investigation", label: "Investigation" },
+  { href: "#memory", label: "Memory" },
   { href: "#mechanism", label: "Mechanism" },
   { href: "#action-center", label: "Action center" },
 ];
